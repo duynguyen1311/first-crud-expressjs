@@ -1,5 +1,4 @@
 const database = require('../services/database')
-const {query} = require("express");
 
 exports.getAllPost = async (req, res) => {
     try {

@@ -1,4 +1,6 @@
 const express = require('express');
+const swaggerUi = require('swagger-ui-express');
+const swaggerFile = require('./swagger-output.json');
 require('dotenv').config();
 const app = express();
 const session = require('express-session');
@@ -11,7 +13,8 @@ app.use(session({
         maxAge: 24 * 60 * 60 * 1000
     }
 }));
-
+// Serve Swagger documentation
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerFile));
 //except request as json
 app.use(express.json());
 //Use route
