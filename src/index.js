@@ -1,6 +1,6 @@
 const express = require('express');
 const swaggerUi = require('swagger-ui-express');
-const swaggerFile = require('./swagger-output.json');
+const swaggerFile = require('./configs/swagger-output.json');
 require('dotenv').config();
 const app = express();
 const session = require('express-session');

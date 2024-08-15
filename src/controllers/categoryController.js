@@ -1,4 +1,4 @@
-const database = require("../services/database");
+const database = require("../configs/db.config");
 exports.getAllCategories = async (req,res) => {
     try{
         const result = await database.pool.query('Select * from categories');

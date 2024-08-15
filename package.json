@@ -4,7 +4,7 @@
   "description": "",
   "main": "src/index.js",
   "scripts": {
-    "prestart": "node src/swagger.js",
+    "prestart": "node src/configs/swagger.config.js",
     "start": "nodemon src/index.js",
     "dev": "nodemon --watch routes --watch src/index.js -x 'npm run prestart && node src/index.js'"
   },

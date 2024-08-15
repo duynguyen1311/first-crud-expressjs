@@ -1,6 +1,6 @@
 const router = require('express').Router()
 const categoryController = require('../controllers/categoryController')
-const authMiddleware = require("../utils/authMiddleware");
+const authMiddleware = require("../middlewares/auth.middleware");
 
 /*router.get('/getAll',authMiddleware.isAuthenticated, categoryController.getAllCategories )
 router.post('/create',authMiddleware.isAuthenticated, categoryController.createCategory)
