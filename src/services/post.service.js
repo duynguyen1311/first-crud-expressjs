@@ -1,4 +1,4 @@
-const database = require('../configs/db.config');
+const database = require('../configs/database/db.config');
 const helper = require('../utils/helper.util');
 class PostService {
     async getAllPosts(categoryId, userId, keyword,page, size) {

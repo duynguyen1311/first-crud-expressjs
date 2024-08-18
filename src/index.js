@@ -1,7 +1,11 @@
 const express = require('express');
 const swaggerUi = require('swagger-ui-express');
-const swaggerFile = require('./configs/swagger-output.json');
+const swaggerFile = require('./configs/swagger/swagger-output.json');
 require('dotenv').config();
+const passport = require('passport');
+const passportJwtStrategy = require('./configs/strategy/passport-jwt-strategy');
+const apiRoutes = require('./routes/route');
+
 const app = express();
 const session = require('express-session');
 //Config session
@@ -17,9 +21,9 @@ app.use(session({
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerFile));
 //except request as json
 app.use(express.json());
+app.use(passport.initialize());
+// Configure Passport JWT strategy
+passportJwtStrategy(passport);
 //Use route
-app.use('/api/categories', require('./routes/categoryRoute'))
-app.use('/api/tags', require('./routes/tagRoute'))
-app.use('/api/users', require('./routes/userRoute'))
-app.use('/api/posts', require('./routes/postRoute'))
+app.use('/api', apiRoutes);
 app.listen(3000, () => console.log('Server started on port 3000'));

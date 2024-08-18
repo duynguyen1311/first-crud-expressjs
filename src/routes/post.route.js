@@ -1,13 +1,14 @@
 const router = require('express').Router();
-const postController = require('../controllers/postController')
+const postController = require('../controllers/post.controller')
 const authMiddleware = require('../middlewares/auth.middleware');
+const ROLE = require("../common/role.constant");
 
 /*router.post('/getAll',authMiddleware.isAuthenticated, postController.getAllPost);
 router.post('/create',authMiddleware.isAuthenticated, postController.createPost);
 router.get('/detail/:id',authMiddleware.isAuthenticated, postController.getPostById);
 router.put('/update/:id',authMiddleware.isAuthenticated, postController.updatePost);*/
 
-router.post('/getAll', authMiddleware.isAuthenticated, (req, res) => {
+router.post('/', authMiddleware.authenticateJWT,authMiddleware.authorizeRole(ROLE.VIEWER,ROLE.EDITOR,ROLE.ADMIN), (req, res) => {
     /**
      * #swagger.tags = ['Posts']
      * #swagger.description = 'Get all posts'
@@ -23,7 +24,7 @@ router.post('/getAll', authMiddleware.isAuthenticated, (req, res) => {
     postController.getAllPost(req, res);
 });
 
-router.post('/create', authMiddleware.isAuthenticated, (req, res) => {
+router.post('/', authMiddleware.authenticateJWT,authMiddleware.authorizeRole(ROLE.EDITOR), (req, res) => {
     /**
      * #swagger.tags = ['Posts']
      * #swagger.description = 'Create a new post'
@@ -38,7 +39,7 @@ router.post('/create', authMiddleware.isAuthenticated, (req, res) => {
     postController.createPost(req, res);
 });
 
-router.get('/detail/:id', authMiddleware.isAuthenticated, (req, res) => {
+router.get('/:id', authMiddleware.authenticateJWT,authMiddleware.authorizeRole(ROLE.EDITOR,ROLE.ADMIN), (req, res) => {
     /**
      * #swagger.tags = ['Posts']
      * #swagger.description = 'Get a post by ID'
@@ -48,7 +49,7 @@ router.get('/detail/:id', authMiddleware.isAuthenticated, (req, res) => {
     postController.getPostById(req, res);
 });
 
-router.put('/update/:id', authMiddleware.isAuthenticated, (req, res) => {
+router.put('/:id', authMiddleware.authenticateJWT,authMiddleware.authorizeRole(ROLE.EDITOR), (req, res) => {
     /**
      * #swagger.tags = ['Posts']
      * #swagger.description = 'Update a post'

@@ -1,5 +1,8 @@
 const router = require('express').Router()
-const userController = require('../controllers/userController')
+const userController = require('../controllers/user.controller')
+const {authenticateJWT} = require("../middlewares/auth.middleware");
+const authMiddleware = require("../middlewares/auth.middleware");
+const ROLE = require("../common/role.constant");
 
 /*router.post('/register', userController.register )
 router.post('/login', userController.login )
@@ -35,7 +38,7 @@ router.post('/login', (req, res) => {
     userController.login(req, res);
 });
 
-router.get('/getAll', (req, res) => {
+router.get('/',authenticateJWT,authMiddleware.authorizeRole(ROLE.ADMIN), (req, res) => {
     /**
      * #swagger.tags = ['Users']
      * #swagger.description = 'Get all users'
@@ -50,7 +53,7 @@ router.get('/getAll', (req, res) => {
     userController.getAllUsers(req, res);
 });
 
-router.get('/detail/:id', (req, res) => {
+router.get('/:id',authenticateJWT,authMiddleware.authorizeRole(ROLE.ADMIN), (req, res) => {
     /**
      * #swagger.tags = ['Users']
      * #swagger.description = 'Get a user by ID'
@@ -58,5 +61,12 @@ router.get('/detail/:id', (req, res) => {
      */
     userController.getUserById(req, res);
 });
-
+router.get('/profile',authenticateJWT, (req, res) => {
+    /**
+     * #swagger.tags = ['Users']
+     * #swagger.description = 'Get user profile'
+     * #swagger.security = [{ "bearerAuth": [] }]
+     */
+    userController.getProfile(req, res);
+});
 module.exports = router

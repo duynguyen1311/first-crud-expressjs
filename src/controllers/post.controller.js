@@ -1,4 +1,4 @@
-const database = require('../configs/db.config')
+const database = require('../configs/database/db.config')
 const postService = require('../services/post.service')
 exports.getAllPost = async (req, res) => {
     try {

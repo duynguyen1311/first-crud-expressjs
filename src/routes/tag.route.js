@@ -1,12 +1,13 @@
 const router = require('express').Router()
-const tagController = require('../controllers/tagController')
-
+const tagController = require('../controllers/tag.controller')
+const authMiddleware = require('../middlewares/auth.middleware');
+const ROLE = require("../common/role.constant");
 /*router.get('/getAll', tagController.getAllTag )
 router.post('/create', tagController.createTag)
 router.put('/update/:id', tagController.updateTag)*/
 //router.delete('/:id', categoryController.deleteCategory)
 
-router.get('/getAll', (req, res) => {
+router.get('/',authMiddleware.authenticateJWT,authMiddleware.authorizeRole(ROLE.VIEWER,ROLE.EDITOR,ROLE.ADMIN), (req, res) => {
     /**
      * #swagger.tags = ['Tags']
      * #swagger.description = 'Get all tags'
@@ -21,7 +22,7 @@ router.get('/getAll', (req, res) => {
     tagController.getAllTag(req, res);
 });
 
-router.post('/create', (req, res) => {
+router.post('/',authMiddleware.authenticateJWT,authMiddleware.authorizeRole(ROLE.EDITOR,ROLE.ADMIN), (req, res) => {
     /**
      * #swagger.tags = ['Tags']
      * #swagger.description = 'Create a new tag'
@@ -35,7 +36,7 @@ router.post('/create', (req, res) => {
     tagController.createTag(req, res);
 });
 
-router.put('/update/:id', (req, res) => {
+router.put('/:id',authMiddleware.authenticateJWT,authMiddleware.authorizeRole(ROLE.EDITOR,ROLE.ADMIN), (req, res) => {
     /**
      * #swagger.tags = ['Tags']
      * #swagger.description = 'Update a tag'
@@ -49,5 +50,12 @@ router.put('/update/:id', (req, res) => {
      */
     tagController.updateTag(req, res);
 });
-
+router.delete('/:id',authMiddleware.authenticateJWT,authMiddleware.authorizeRole(ROLE.EDITOR,ROLE.ADMIN), (req, res) => {
+    /**
+     * #swagger.tags = ['Tags']
+     * #swagger.description = 'Delete a tag'
+     * #swagger.parameters['id'] = { description: 'Tag ID' }
+     */
+    tagController.deleteTag(req, res);
+});
 module.exports = router

@@ -8,10 +8,19 @@
   "host": "localhost:3000",
   "basePath": "/",
   "schemes": [
-    "http"
+    "http",
+    "https"
   ],
+  "securityDefinitions": {
+    "bearerAuth": {
+      "type": "apiKey",
+      "in": "header",
+      "name": "Authorization",
+      "description": "Enter your bearer token in the format **Bearer &lt;token>**"
+    }
+  },
   "paths": {
-    "/api/categories/getAll": {
+    "/api/categories/": {
       "get": {
         "tags": [
           "Categories"
@@ -24,6 +33,9 @@
           "401": {
             "description": "Unauthorized"
           },
+          "403": {
+            "description": "Forbidden"
+          },
           "500": {
             "description": "Internal Server Error"
           }
@@ -33,9 +45,7 @@
             "bearerAuth": []
           }
         ]
-      }
-    },
-    "/api/categories/create": {
+      },
       "post": {
         "tags": [
           "Categories"
@@ -62,6 +72,9 @@
           "401": {
             "description": "Unauthorized"
           },
+          "403": {
+            "description": "Forbidden"
+          },
           "409": {
             "description": "Conflict"
           },
@@ -79,7 +92,7 @@
         ]
       }
     },
-    "/api/categories/update/{id}": {
+    "/api/categories/{id}": {
       "put": {
         "tags": [
           "Categories"
@@ -113,6 +126,9 @@
           "401": {
             "description": "Unauthorized"
           },
+          "403": {
+            "description": "Forbidden"
+          },
           "404": {
             "description": "Not Found"
           },
@@ -131,9 +147,43 @@
             "bearerAuth": []
           }
         ]
+      },
+      "delete": {
+        "tags": [
+          "Categories"
+        ],
+        "description": "Endpoint to delete a category",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "Category ID"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
-    "/api/tags/getAll": {
+    "/api/tags/": {
       "get": {
         "tags": [
           "Tags"
@@ -143,13 +193,17 @@
           "200": {
             "description": "OK"
           },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
           "500": {
             "description": "Internal Server Error"
           }
         }
-      }
-    },
-    "/api/tags/create": {
+      },
       "post": {
         "tags": [
           "Tags"
@@ -173,6 +227,12 @@
           "201": {
             "description": "Created"
           },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
           "409": {
             "description": "Conflict"
           },
@@ -185,7 +245,7 @@
         }
       }
     },
-    "/api/tags/update/{id}": {
+    "/api/tags/{id}": {
       "put": {
         "tags": [
           "Tags"
@@ -216,6 +276,12 @@
           "200": {
             "description": "OK"
           },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
           "404": {
             "description": "Not Found"
           },
@@ -224,6 +290,35 @@
           },
           "422": {
             "description": "Unprocessable Entity"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Tags"
+        ],
+        "description": "Delete a tag",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "Tag ID"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
           },
           "500": {
             "description": "Internal Server Error"
@@ -300,9 +395,6 @@
           "200": {
             "description": "OK"
           },
-          "401": {
-            "description": "Unauthorized"
-          },
           "422": {
             "description": "Unprocessable Entity"
           },
@@ -312,7 +404,7 @@
         }
       }
     },
-    "/api/users/getAll": {
+    "/api/users/": {
       "get": {
         "tags": [
           "Users"
@@ -322,13 +414,19 @@
           "200": {
             "description": "OK"
           },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
           "500": {
             "description": "Internal Server Error"
           }
         }
       }
     },
-    "/api/users/detail/{id}": {
+    "/api/users/{id}": {
       "get": {
         "tags": [
           "Users"
@@ -347,11 +445,11 @@
           "200": {
             "description": "OK"
           },
-          "400": {
-            "description": "Bad Request"
+          "401": {
+            "description": "Unauthorized"
           },
-          "404": {
-            "description": "Not Found"
+          "403": {
+            "description": "Forbidden"
           },
           "500": {
             "description": "Internal Server Error"
@@ -359,44 +457,15 @@
         }
       }
     },
-    "/api/posts/getAll": {
-      "post": {
+    "/api/users/profile": {
+      "get": {
         "tags": [
-          "Posts"
+          "Users"
         ],
-        "description": "Get all posts",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "categoryId": {
-                  "example": "any"
-                },
-                "userId": {
-                  "example": "any"
-                },
-                "keyword": {
-                  "example": "any"
-                },
-                "page": {
-                  "example": "any"
-                },
-                "size": {
-                  "example": "any"
-                }
-              }
-            }
-          }
-        ],
+        "description": "Get user profile",
         "responses": {
           "200": {
             "description": "OK"
-          },
-          "400": {
-            "description": "Bad Request"
           },
           "401": {
             "description": "Unauthorized"
@@ -412,7 +481,7 @@
         ]
       }
     },
-    "/api/posts/create": {
+    "/api/posts/": {
       "post": {
         "tags": [
           "Posts"
@@ -448,6 +517,9 @@
           "401": {
             "description": "Unauthorized"
           },
+          "403": {
+            "description": "Forbidden"
+          },
           "500": {
             "description": "Internal Server Error"
           }
@@ -459,7 +531,7 @@
         ]
       }
     },
-    "/api/posts/detail/{id}": {
+    "/api/posts/{id}": {
       "get": {
         "tags": [
           "Posts"
@@ -481,6 +553,9 @@
           "401": {
             "description": "Unauthorized"
           },
+          "403": {
+            "description": "Forbidden"
+          },
           "404": {
             "description": "Not Found"
           },
@@ -493,9 +568,7 @@
             "bearerAuth": []
           }
         ]
-      }
-    },
-    "/api/posts/update/{id}": {
+      },
       "put": {
         "tags": [
           "Posts"
@@ -538,6 +611,9 @@
           "401": {
             "description": "Unauthorized"
           },
+          "403": {
+            "description": "Forbidden"
+          },
           "500": {
             "description": "Internal Server Error"
           }
@@ -549,5 +625,10 @@
         ]
       }
     }
-  }
+  },
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ]
 }
