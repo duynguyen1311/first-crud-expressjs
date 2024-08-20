@@ -64,8 +64,18 @@ exports.getUserById = async (req, res) => {
 };
 exports.getProfile = async (req, res) => {
     try {
-        console.log(req.user);
-        const result = await userService.getProfile(req.user.userId);
+        const user = req.session.user;
+        console.log("User from session:", user);
+        const result = await userService.getProfile(user.userId);
+        return res.status(200).json(result);
+    } catch (error) {
+        return res.status(500).json({ error: error.message });
+    }
+}
+exports.changeUserActiveStatus = async (req, res) => {
+    try {
+        const result = await userService.changeUserActiveStatus(req.params.id, req.params.is_active);
+        await cacheHelper.del(CACHE_KEY);
         return res.status(200).json(result);
     } catch (error) {
         return res.status(500).json({ error: error.message });

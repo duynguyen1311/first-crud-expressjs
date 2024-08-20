@@ -11,6 +11,10 @@ class UserService {
         if (!user) {
             return {error: "Invalid email or password"};
         }
+        // Check if user is active
+        if (!user.is_active) {
+            return {error: "User is inactive"};
+        }
         // Compare provided password with stored hash
         const isPasswordValid = await bcrypt.compare(password, user.password_hash);
         if (!isPasswordValid) {
@@ -57,22 +61,25 @@ class UserService {
     }
     async getAllUsers(){
         const result = await database.pool.query({
-            text: 'SELECT id, username, email FROM users ORDER BY id ASC'
+            text: 'SELECT id, username, email, is_active FROM users where is_active = true ORDER BY id ASC'
         });
         return result.rows;
     }
     async getUserById(id){
         const result = await database.pool.query({
-            text: 'SELECT id, username, email FROM users WHERE id = $1',
+            text: 'SELECT id, username, email, is_active FROM users WHERE is_active = true and id = $1',
             values: [id]
         });
+        if (!result.rows[0].is_active) {
+            return {error: "User is inactive"};
+        }
         if(!id) return {error: "User ID is required"};
         if(result.rows.length === 0) return {error: "User not found"};
         return result.rows[0];
     }
     async getUserByEmail(email){
         const result = await database.pool.query({
-            text: 'SELECT id, username, email, password_hash, role_id FROM users WHERE email = $1',
+            text: 'SELECT id, username, email, password_hash, role_id, is_active FROM users WHERE email = $1',
             values: [email]
         });
         if(result.rows.length === 0) return null;
@@ -88,11 +95,25 @@ class UserService {
     }
     async getProfile(userId){
         const result = await database.pool.query({
-            text: 'SELECT id, username, email FROM users WHERE id = $1',
+            text: 'SELECT id, username, email, is_active FROM users WHERE id = $1',
             values: [userId]
         });
         if(result.rows.length === 0) return {error: "User not found"};
         return result.rows[0];
+    }
+    async changeUserActiveStatus(userId, isActive){
+        const result = await database.pool.query({
+            text: `UPDATE users
+            SET is_active = $1
+            WHERE id = $2
+            RETURNING id, username, email, is_active`,
+            values: [isActive, userId]
+        });
+        if(result.rows.length === 0) return {error: "User not found"};
+        return {
+            message: `User ${isActive ? 'activated' : 'deactivated'} successfully`,
+            user: result.rows[0]
+        };
     }
 }
 module.exports = new UserService();

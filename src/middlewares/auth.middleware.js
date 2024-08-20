@@ -14,7 +14,7 @@ const authenticateJWT = (req, res, next) => {
         if (!user) {
             return res.status(401).json({ message: 'Unauthorized' });
         }
-        req.user = user; // This sets the user information in the request
+        req.session.user = user; // This sets the user information in the request
         next();
     })(req, res, next);
 };

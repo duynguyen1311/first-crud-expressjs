@@ -51,7 +51,14 @@ router.get('/users',authMiddleware.authenticateJWT, (req, res) => {
      */
     userController.getAllUsers(req, res);
 });
-
+router.get('/users/getProfile',authMiddleware.authenticateJWT, (req, res) => {
+    /**
+     * #swagger.tags = ['Users']
+     * #swagger.description = 'Get user profile'
+     * #swagger.security = [{ "bearerAuth": [] }]
+     */
+    userController.getProfile(req, res);
+});
 router.get('/users/:id',authMiddleware.authenticateJWT, (req, res) => {
     /**
      * #swagger.tags = ['Users']
@@ -60,12 +67,15 @@ router.get('/users/:id',authMiddleware.authenticateJWT, (req, res) => {
      */
     userController.getUserById(req, res);
 });
-router.get('/users/profile',authMiddleware.authenticateJWT, (req, res) => {
+//change user active status
+router.put('/users/:id/:is_active',authMiddleware.authenticateJWT, (req, res) => {
     /**
      * #swagger.tags = ['Users']
-     * #swagger.description = 'Get user profile'
-     * #swagger.security = [{ "bearerAuth": [] }]
+     * #swagger.description = 'Change user active status'
+     * #swagger.parameters['id'] = { description: 'User ID' }
+     * #swagger.parameters['is_active'] = { description: 'Active status' }
      */
-    userController.getProfile(req, res);
+    userController.changeUserActiveStatus(req, res);
 });
+
 module.exports = router
