@@ -36,7 +36,7 @@ class CategoryService{
     }
     async deleteCategory(id){
         const countResult = await database.pool.query({
-            text: 'SELECT COUNT(*) FROM product WHERE category_id = $1',
+            text: 'SELECT COUNT(*) FROM posts WHERE category_id = $1',
             values: [id]
         });
         if (countResult.rows[0].count > 0) {

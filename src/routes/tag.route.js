@@ -7,7 +7,7 @@ router.post('/create', tagController.createTag)
 router.put('/update/:id', tagController.updateTag)*/
 //router.delete('/:id', categoryController.deleteCategory)
 
-router.get('/',authMiddleware.authenticateJWT,authMiddleware.authorizeRole(ROLE.VIEWER,ROLE.EDITOR,ROLE.ADMIN), (req, res) => {
+router.get('/tags',authMiddleware.authenticateJWT, (req, res) => {
     /**
      * #swagger.tags = ['Tags']
      * #swagger.description = 'Get all tags'
@@ -22,7 +22,7 @@ router.get('/',authMiddleware.authenticateJWT,authMiddleware.authorizeRole(ROLE.
     tagController.getAllTag(req, res);
 });
 
-router.post('/',authMiddleware.authenticateJWT,authMiddleware.authorizeRole(ROLE.EDITOR,ROLE.ADMIN), (req, res) => {
+router.post('/tags',authMiddleware.authenticateJWT, (req, res) => {
     /**
      * #swagger.tags = ['Tags']
      * #swagger.description = 'Create a new tag'
@@ -36,7 +36,7 @@ router.post('/',authMiddleware.authenticateJWT,authMiddleware.authorizeRole(ROLE
     tagController.createTag(req, res);
 });
 
-router.put('/:id',authMiddleware.authenticateJWT,authMiddleware.authorizeRole(ROLE.EDITOR,ROLE.ADMIN), (req, res) => {
+router.put('/tags/:id',authMiddleware.authenticateJWT, (req, res) => {
     /**
      * #swagger.tags = ['Tags']
      * #swagger.description = 'Update a tag'
@@ -50,7 +50,7 @@ router.put('/:id',authMiddleware.authenticateJWT,authMiddleware.authorizeRole(RO
      */
     tagController.updateTag(req, res);
 });
-router.delete('/:id',authMiddleware.authenticateJWT,authMiddleware.authorizeRole(ROLE.EDITOR,ROLE.ADMIN), (req, res) => {
+router.delete('/tags/:id',authMiddleware.authenticateJWT, (req, res) => {
     /**
      * #swagger.tags = ['Tags']
      * #swagger.description = 'Delete a tag'

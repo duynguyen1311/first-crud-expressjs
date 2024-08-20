@@ -24,14 +24,18 @@ exports.getAllPost = async (req, res) => {
 
 exports.createPost = async (req, res) => {
     try {
-        const { title, content, category_id } = req.body;
-        const user_id = req.session.userId;
-        if (!title || !content || !user_id || !category_id) {
+        const { title, content, category_id, tag_id } = req.body;
+        const user_id = req.user.userId
+        if (!title || !content || !category_id) {
             return res.status(400).json({
-                error: "Title, content, user_id, and category_id are required"
+                error: "Title, content, and category_id are required"
             });
         }
-        const result = await postService.createPost(title,content,user_id,category_id);
+        if(!await postService.checkTagExists(tag_id)){
+            return res.status(400).json({error: 'Tag not found'});
+        }
+
+        const result = await postService.createPost(title,content,user_id,category_id,tag_id);
         return res.status(201).json(result);
     } catch (error) {
         return res.status(500).json({ error: error.message });

@@ -47,10 +47,11 @@ class UserService {
     }
     async register(username, email, password){
         const saltRounds = 10;
+        const defaultRole = 3; // Viewer
         const passwordHash = await bcrypt.hash(password, saltRounds);
         const result = await database.pool.query({
-            text: 'INSERT INTO users (username, email, password_hash) VALUES ($1, $2, $3) RETURNING id, username, email',
-            values: [username, email, passwordHash]
+            text: 'INSERT INTO users (username, email, password_hash, role_id) VALUES ($1, $2, $3, $4) RETURNING id, username, email',
+            values: [username, email, passwordHash, defaultRole]
         });
         return result.rows[0];
     }
@@ -71,7 +72,7 @@ class UserService {
     }
     async getUserByEmail(email){
         const result = await database.pool.query({
-            text: 'SELECT id, username, email, password_hash FROM users WHERE email = $1',
+            text: 'SELECT id, username, email, password_hash, role_id FROM users WHERE email = $1',
             values: [email]
         });
         if(result.rows.length === 0) return null;

@@ -22,6 +22,7 @@ const authenticateJWT = (req, res, next) => {
 // Middleware for role-based authorization
 const authorizeRole = (allowedRoles) => {
     return (req, res, next) => {
+        console.log(allowedRoles)
         console.log("Author:",req.user)
         if (!req.user) {
             return res.status(401).json({ message: 'Unauthorized' });

@@ -25,5 +25,5 @@ app.use(passport.initialize());
 // Configure Passport JWT strategy
 passportJwtStrategy(passport);
 //Use route
-app.use('/api', apiRoutes);
+app.use(apiRoutes);
 app.listen(3000, () => console.log('Server started on port 3000'));

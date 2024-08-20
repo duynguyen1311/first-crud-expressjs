@@ -27,7 +27,7 @@ class TagService {
     }
 
     async deleteTag(tagId) {
-        const result = await database.pool({
+        const result = await database.pool.query({
             text: 'DELETE FROM tags WHERE id = $1',
             values: [tagId]
         });

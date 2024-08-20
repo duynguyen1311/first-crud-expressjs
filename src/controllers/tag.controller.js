@@ -43,12 +43,12 @@ exports.updateTag = async (req,res) => {
         if (!req.body.name) {
             return res.status(422).json({ error: 'Name is required' });
         } else {
-            if (await tagService.checkTagExists(req.body.name)) {
+            if (!await tagService.checkTagExists(req.body.name)) {
                 return res.status(409).json({ error: `Tag ${req.body.name} already exists` });
             }
         }
         const result = await tagService.updateTag(req.params.id, req.body.name);
-        if(result) return res.status(404).json({error: 'Tag not found'});
+        if(!result) return res.status(404).json({error: 'Tag not found'});
         //Invalidate the cache when a new tag is created
         await cacheHelper.del(CACHE_KEY);
         return res.status(200).json(result);

@@ -1,6 +1,5 @@
 const router = require('express').Router()
 const userController = require('../controllers/user.controller')
-const {authenticateJWT} = require("../middlewares/auth.middleware");
 const authMiddleware = require("../middlewares/auth.middleware");
 const ROLE = require("../common/role.constant");
 
@@ -10,7 +9,7 @@ router.get('/getAll', userController.getAllUsers)
 router.get('/detail/:id', userController.getUserById)*/
 //router.delete('/:id', categoryController.deleteCategory)
 
-router.post('/register', (req, res) => {
+router.post('/users/register', (req, res) => {
     /**
      * #swagger.tags = ['Users']
      * #swagger.description = 'Register a new user'
@@ -24,7 +23,7 @@ router.post('/register', (req, res) => {
     userController.register(req, res);
 });
 
-router.post('/login', (req, res) => {
+router.post('/users/login', (req, res) => {
     /**
      * #swagger.tags = ['Users']
      * #swagger.description = 'User login'
@@ -38,7 +37,7 @@ router.post('/login', (req, res) => {
     userController.login(req, res);
 });
 
-router.get('/',authenticateJWT,authMiddleware.authorizeRole(ROLE.ADMIN), (req, res) => {
+router.get('/users',authMiddleware.authenticateJWT, (req, res) => {
     /**
      * #swagger.tags = ['Users']
      * #swagger.description = 'Get all users'
@@ -53,7 +52,7 @@ router.get('/',authenticateJWT,authMiddleware.authorizeRole(ROLE.ADMIN), (req, r
     userController.getAllUsers(req, res);
 });
 
-router.get('/:id',authenticateJWT,authMiddleware.authorizeRole(ROLE.ADMIN), (req, res) => {
+router.get('/users/:id',authMiddleware.authenticateJWT, (req, res) => {
     /**
      * #swagger.tags = ['Users']
      * #swagger.description = 'Get a user by ID'
@@ -61,7 +60,7 @@ router.get('/:id',authenticateJWT,authMiddleware.authorizeRole(ROLE.ADMIN), (req
      */
     userController.getUserById(req, res);
 });
-router.get('/profile',authenticateJWT, (req, res) => {
+router.get('/users/profile',authMiddleware.authenticateJWT, (req, res) => {
     /**
      * #swagger.tags = ['Users']
      * #swagger.description = 'Get user profile'

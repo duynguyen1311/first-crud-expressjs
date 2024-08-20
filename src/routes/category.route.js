@@ -8,7 +8,7 @@ router.post('/create',authMiddleware.isAuthenticated, categoryController.createC
 router.put('/update/:id',authMiddleware.isAuthenticated, categoryController.updateCategory)*/
 //router.delete('/:id', categoryController.deleteCategory)
 
-router.get('/', authMiddleware.authenticateJWT,authMiddleware.authorizeRole(ROLE.VIEWER,ROLE.EDITOR,ROLE.ADMIN), (req, res) => {
+router.get('/categories', authMiddleware.authenticateJWT, (req, res) => {
     /**
      * #swagger.tags = ['Categories']
      * #swagger.description = 'Endpoint to get all categories'
@@ -24,7 +24,7 @@ router.get('/', authMiddleware.authenticateJWT,authMiddleware.authorizeRole(ROLE
     categoryController.getAllCategories(req, res);
 });
 
-router.post('/', authMiddleware.authenticateJWT,authMiddleware.authorizeRole(ROLE.EDITOR,ROLE.ADMIN), (req, res) => {
+router.post('/categories', authMiddleware.authenticateJWT, (req, res) => {
     /**
      * #swagger.tags = ['Categories']
      * #swagger.description = 'Endpoint to create a new category'
@@ -43,7 +43,7 @@ router.post('/', authMiddleware.authenticateJWT,authMiddleware.authorizeRole(ROL
     categoryController.createCategory(req, res);
 });
 
-router.put('/:id', authMiddleware.authenticateJWT,authMiddleware.authorizeRole(ROLE.EDITOR,ROLE.ADMIN), (req, res) => {
+router.put('/categories/:id', authMiddleware.authenticateJWT, (req, res) => {
     /**
      * #swagger.tags = ['Categories']
      * #swagger.description = 'Endpoint to update a category'
@@ -63,7 +63,7 @@ router.put('/:id', authMiddleware.authenticateJWT,authMiddleware.authorizeRole(R
     categoryController.updateCategory(req, res);
 });
 
-router.delete('/:id', authMiddleware.authenticateJWT,authMiddleware.authorizeRole(ROLE.EDITOR,ROLE.ADMIN), (req, res) => {
+router.delete('/categories/:id', authMiddleware.authenticateJWT, (req, res) => {
     /**
      * #swagger.tags = ['Categories']
      * #swagger.description = 'Endpoint to delete a category'
