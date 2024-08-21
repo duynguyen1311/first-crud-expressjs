@@ -22,20 +22,21 @@ class UserService {
         }
         switch (user.role_id) {
             case 1:
-                role = ROLE.ADMIN;
+                role = "admin";
                 break;
             case 2:
-                role = ROLE.EDITOR;
+                role = "editor"
                 break;
             default:
-                role = ROLE.VIEWER;
+                role = "viewer";
                 break;
         }
         // Generate JWT token
         const token = jwt.sign({
             userId: user.id,
             email: user.email,
-            role: role
+            role: role,
+            roleId: user.role_id
         }, process.env.JWT_SECRET, {
             expiresIn: '1h'
         });

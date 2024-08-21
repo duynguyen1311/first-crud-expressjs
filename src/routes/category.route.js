@@ -8,7 +8,8 @@ router.post('/create',authMiddleware.isAuthenticated, categoryController.createC
 router.put('/update/:id',authMiddleware.isAuthenticated, categoryController.updateCategory)*/
 //router.delete('/:id', categoryController.deleteCategory)
 
-router.get('/categories', authMiddleware.authenticateJWT, (req, res) => {
+router.get('/categories', authMiddleware.authenticateJWT
+    ,authMiddleware.authorizeRole([ROLE.VIEWER,ROLE.ADMIN,ROLE.EDITOR]), (req, res) => {
     /**
      * #swagger.tags = ['Categories']
      * #swagger.description = 'Endpoint to get all categories'

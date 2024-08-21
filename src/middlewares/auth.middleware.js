@@ -14,20 +14,21 @@ const authenticateJWT = (req, res, next) => {
         if (!user) {
             return res.status(401).json({ message: 'Unauthorized' });
         }
-        req.session.user = user; // This sets the user information in the request
+        req.session.user = user; // This sets the user information in the session
         next();
     })(req, res, next);
 };
 
 // Middleware for role-based authorization
-const authorizeRole = (allowedRoles) => {
+const authorizeRole = (allowedRoleIds) => {
     return (req, res, next) => {
-        console.log(allowedRoles)
-        console.log("Author:",req.user)
-        if (!req.user) {
+        const user = req.session.user;
+        console.log(allowedRoleIds)
+        console.log("Author:",user)
+        if (!user) {
             return res.status(401).json({ message: 'Unauthorized' });
         }
-        if (allowedRoles.includes(req.user.role)) {
+        if (allowedRoleIds.some(roleId => user.roleId <= roleId)) {
             next();
         } else {
             res.status(403).json({ message: 'Forbidden' });
