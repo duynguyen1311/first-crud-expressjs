@@ -7,22 +7,8 @@ router.post('/create', tagController.createTag)
 router.put('/update/:id', tagController.updateTag)*/
 //router.delete('/:id', categoryController.deleteCategory)
 
-router.get('/tags',authMiddleware.authenticateJWT, (req, res) => {
-    /**
-     * #swagger.tags = ['Tags']
-     * #swagger.description = 'Get all tags'
-     * #swagger.responses[200] = {
-     *   description: 'Successful response',
-     *   schema: {
-     *     type: 'array',
-     *     items: { $ref: '#/definitions/Tag' }
-     *   }
-     * }
-     */
-    tagController.getAllTag(req, res);
-});
-
-router.post('/tags',authMiddleware.authenticateJWT, (req, res) => {
+router.post('/tags',authMiddleware.authenticateJWT,authMiddleware.authorizeRole([ROLE.ADMIN]),
+    (req, res) => {
     /**
      * #swagger.tags = ['Tags']
      * #swagger.description = 'Create a new tag'
@@ -36,7 +22,8 @@ router.post('/tags',authMiddleware.authenticateJWT, (req, res) => {
     tagController.createTag(req, res);
 });
 
-router.put('/tags/:id',authMiddleware.authenticateJWT, (req, res) => {
+router.put('/tags/:id',authMiddleware.authenticateJWT,authMiddleware.authorizeRole([ROLE.ADMIN]),
+    (req, res) => {
     /**
      * #swagger.tags = ['Tags']
      * #swagger.description = 'Update a tag'
@@ -50,7 +37,8 @@ router.put('/tags/:id',authMiddleware.authenticateJWT, (req, res) => {
      */
     tagController.updateTag(req, res);
 });
-router.delete('/tags/:id',authMiddleware.authenticateJWT, (req, res) => {
+router.delete('/tags/:id',authMiddleware.authenticateJWT,authMiddleware.authorizeRole([ROLE.ADMIN]),
+    (req, res) => {
     /**
      * #swagger.tags = ['Tags']
      * #swagger.description = 'Delete a tag'
@@ -58,4 +46,21 @@ router.delete('/tags/:id',authMiddleware.authenticateJWT, (req, res) => {
      */
     tagController.deleteTag(req, res);
 });
+
+router.get('/tags',authMiddleware.authenticateJWT,authMiddleware.authorizeRole([ROLE.VIEWER]),
+    (req, res) => {
+        /**
+         * #swagger.tags = ['Tags']
+         * #swagger.description = 'Get all tags'
+         * #swagger.responses[200] = {
+         *   description: 'Successful response',
+         *   schema: {
+         *     type: 'array',
+         *     items: { $ref: '#/definitions/Tag' }
+         *   }
+         * }
+         */
+        tagController.getAllTag(req, res);
+    });
+
 module.exports = router

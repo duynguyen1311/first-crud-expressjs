@@ -8,24 +8,8 @@ router.post('/create',authMiddleware.isAuthenticated, categoryController.createC
 router.put('/update/:id',authMiddleware.isAuthenticated, categoryController.updateCategory)*/
 //router.delete('/:id', categoryController.deleteCategory)
 
-router.get('/categories', authMiddleware.authenticateJWT
-    ,authMiddleware.authorizeRole([ROLE.VIEWER,ROLE.ADMIN,ROLE.EDITOR]), (req, res) => {
-    /**
-     * #swagger.tags = ['Categories']
-     * #swagger.description = 'Endpoint to get all categories'
-     * #swagger.security = [{ "bearerAuth": [] }]
-     * #swagger.responses[200] = {
-     *   description: 'Successful response',
-     *   schema: {
-     *     type: 'array',
-     *     items: { $ref: '#/definitions/Category' }
-     *   }
-     * }
-     */
-    categoryController.getAllCategories(req, res);
-});
-
-router.post('/categories', authMiddleware.authenticateJWT, (req, res) => {
+router.post('/categories', authMiddleware.authenticateJWT,authMiddleware.authorizeRole([ROLE.ADMIN]),
+    (req, res) => {
     /**
      * #swagger.tags = ['Categories']
      * #swagger.description = 'Endpoint to create a new category'
@@ -44,7 +28,8 @@ router.post('/categories', authMiddleware.authenticateJWT, (req, res) => {
     categoryController.createCategory(req, res);
 });
 
-router.put('/categories/:id', authMiddleware.authenticateJWT, (req, res) => {
+router.put('/categories/:id', authMiddleware.authenticateJWT,authMiddleware.authorizeRole([ROLE.ADMIN]),
+    (req, res) => {
     /**
      * #swagger.tags = ['Categories']
      * #swagger.description = 'Endpoint to update a category'
@@ -64,7 +49,8 @@ router.put('/categories/:id', authMiddleware.authenticateJWT, (req, res) => {
     categoryController.updateCategory(req, res);
 });
 
-router.delete('/categories/:id', authMiddleware.authenticateJWT, (req, res) => {
+router.delete('/categories/:id', authMiddleware.authenticateJWT,authMiddleware.authorizeRole([ROLE.ADMIN]),
+    (req, res) => {
     /**
      * #swagger.tags = ['Categories']
      * #swagger.description = 'Endpoint to delete a category'
@@ -76,6 +62,25 @@ router.delete('/categories/:id', authMiddleware.authenticateJWT, (req, res) => {
      */
     categoryController.deleteCategory(req, res);
 });
+router.get('/categories', authMiddleware.authenticateJWT
+    ,authMiddleware.authorizeRole([ROLE.VIEWER]), (req, res) => {
+    /**
+     * #swagger.tags = ['Categories']
+     * #swagger.description = 'Endpoint to get all categories'
+     * #swagger.security = [{ "bearerAuth": [] }]
+     * #swagger.responses[200] = {
+     *   description: 'Successful response',
+     *   schema: {
+     *     type: 'array',
+     *     items: { $ref: '#/definitions/Category' }
+     *   }
+     * }
+     */
+    categoryController.getAllCategories(req, res);
+});
+
+
+
 
 
 module.exports = router
