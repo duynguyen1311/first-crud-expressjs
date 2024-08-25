@@ -1,7 +1,7 @@
 const userService = require("../services/user.service");
 const cacheHelper = require('../utils/cacheHelper.utils');
 const logger = require('../configs/logger/logger.config');
-
+const helper = require('../utils/helper.util');
 const CACHE_KEY = 'all_users';
 const CACHE_TTL = 3600; // Cache for 1 hour
 
@@ -9,11 +9,10 @@ exports.register = async (req, res) => {
     logger.info('POST request received for user registration');
     try {
         const { username, email, password } = req.body;
-
-        if (!username || !email || !password) {
-            return res.status(422).json({
-                error: "Username, email, and password are required!"
-            });
+        const validation = helper.validateUserInput({ username, email, password });
+        if(!validation.isValid) {
+            logger.error(`Error in register: ${validation.errors}`);
+            return res.status(422).json(validation.errors);
         }
         if (await userService.checkUserExists(email, username)) {
             return res.status(409).json({
@@ -33,11 +32,10 @@ exports.login = async (req, res) => {
     logger.info('POST request received for user login');
     try {
         const { email, password } = req.body;
-
-        if (!email || !password) {
-            return res.status(422).json({
-                error: "Email and password are required!"
-            });
+        const validation = helper.validateLoginInput({ email, password });
+        if(!validation.isValid) {
+            logger.error(`Error in login: ${validation.errors}`);
+            return res.status(422).json(validation.errors);
         }
         const result = await userService.login(email, password);
         logger.info(`User logged in: ${email}`);
@@ -70,6 +68,10 @@ exports.getUserById = async (req, res) => {
     const userId = req.params.id;
     logger.info(`GET request received for user ID: ${userId}`);
     try {
+        const isValidId = helper.isValidId(userId);
+        if (!isValidId) {
+            return res.status(400).json({ error: 'Invalid user ID' });
+        }
         const result = await userService.getUserById(userId);
         if (!result) {
             return res.status(404).json({ error: "User not found" });
@@ -104,6 +106,10 @@ exports.changeUserActiveStatus = async (req, res) => {
     const isActive = req.params.is_active;
     logger.info(`PUT request received to change active status for user ID: ${userId} to ${isActive}`);
     try {
+        const isValidId = helper.isValidId(userId);
+        if (!isValidId) {
+            return res.status(400).json({ error: 'Invalid user ID' });
+        }
         const result = await userService.changeUserActiveStatus(userId, isActive);
         if (!result) {
             return res.status(404).json({ error: "User not found" });

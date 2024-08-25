@@ -19,6 +19,14 @@ router.get('/users',authMiddleware.authenticateJWT,authMiddleware.authorizeRole(
      */
     userController.getAllUsers(req, res);
 });
+router.get('/users/getProfile',authMiddleware.authenticateJWT, (req, res) => {
+    /**
+     * #swagger.tags = ['Users']
+     * #swagger.description = 'Get user profile'
+     * #swagger.security = [{ "bearerAuth": [] }]
+     */
+    userController.getProfile(req, res);
+});
 router.get('/users/:id',authMiddleware.authenticateJWT,authMiddleware.authorizeRole([ROLE.ADMIN]),
     (req, res) => {
     /**
@@ -39,6 +47,7 @@ router.put('/users/:id/:is_active',authMiddleware.authenticateJWT,authMiddleware
      */
     userController.changeUserActiveStatus(req, res);
 });
+
 router.post('/users/register', (req, res) => {
     /**
      * #swagger.tags = ['Users']
@@ -65,13 +74,5 @@ router.post('/users/login', (req, res) => {
      * }
      */
     userController.login(req, res);
-});
-router.get('/users/getProfile',authMiddleware.authenticateJWT, (req, res) => {
-    /**
-     * #swagger.tags = ['Users']
-     * #swagger.description = 'Get user profile'
-     * #swagger.security = [{ "bearerAuth": [] }]
-     */
-    userController.getProfile(req, res);
 });
 module.exports = router

@@ -56,12 +56,12 @@ class PostService {
             rows: result.rows
         }, page, limit);
     }
-    async createPost(title, content, userId, categoryId, tagId) {
+    async createPost(title, content, userId, categoryId, tagIds) {
         const result = await database.pool.query({
             text: 'INSERT INTO posts (title, content, user_id, category_id) VALUES ($1, $2, $3, $4) RETURNING *',
-            values: [title, content, userId, categoryId,tagId]
+            values: [title, content, userId, categoryId]
         });
-        await this.addTagToPost(result.rows[0].id, tagId);
+        await this.addTagToPost(result.rows[0].id, tagIds);
         return result.rows[0];
     }
     async getPostById(postId) {
@@ -106,11 +106,21 @@ class PostService {
 
         return result.rows[0];
     }
-    async addTagToPost(postId, tagId) {
-        await database.pool.query({
-            text: 'INSERT INTO post_tags (post_id, tag_id) VALUES ($1, $2)',
-            values: [postId, tagId]
-        });
+    async addTagToPost(postId, tagIds) {
+        //loop tagIds to check for existing tag
+        for (const tagId of tagIds) {
+            const tagExists = await this.checkTagExists(tagId);
+            if (!tagExists) {
+                throw new Error(`Tag ID ${tagId} not found`);
+            }
+            //insert tag to post_tags
+            await database.pool.query({
+                text: 'INSERT INTO post_tags (post_id, tag_id) VALUES ($1, $2)',
+                values: [postId, tagId]
+            });
+        }
+
+
     }
     //check existing tag
     async checkTagExists(tagId) {

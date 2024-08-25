@@ -1,6 +1,7 @@
 const tagService = require("../services/tag.service");
 const cacheHelper = require('../utils/cacheHelper.utils');
 const logger = require('../configs/logger/logger.config');
+const helper = require("../utils/helper.util");
 
 const CACHE_KEY = 'all_tags';
 const CACHE_TTL = 3600; // Cache for 1 hour
@@ -53,6 +54,10 @@ exports.createTag = async (req, res) => {
 exports.updateTag = async (req, res) => {
     logger.info(`PUT request received to update tag ID: ${req.params.id}`);
     try {
+        const isValidId = helper.isValidId(req.params.id);
+        if (!isValidId) {
+            return res.status(400).json({ error: 'Invalid tag ID' });
+        }
         if (!req.body.name) {
             return res.status(422).json({ error: 'Name is required' });
         } else {
@@ -79,6 +84,10 @@ exports.updateTag = async (req, res) => {
 exports.deleteTag = async (req, res) => {
     logger.info(`DELETE request received for tag ID: ${req.params.id}`);
     try {
+        const isValidId = helper.isValidId(req.params.id);
+        if (!isValidId) {
+            return res.status(400).json({ error: 'Invalid tag ID' });
+        }
         const result = await tagService.deleteTag(req.params.id);
         // Invalidate the cache when a tag is deleted
         await cacheHelper.del(CACHE_KEY);

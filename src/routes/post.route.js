@@ -48,7 +48,7 @@ router.post('/posts', authMiddleware.authenticateJWT, (req, res) => {
     postController.getAllPost(req, res);
 });
 
-router.post('/posts', authMiddleware.authenticateJWT, (req, res) => {
+router.post('/posts/create', authMiddleware.authenticateJWT, (req, res) => {
     /**
      * #swagger.tags = ['Posts']
      * #swagger.description = 'Create a new post'

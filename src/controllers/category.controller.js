@@ -1,7 +1,7 @@
 const categoryService = require('../services/category.service');
 const cacheHelper = require('../utils/cacheHelper.utils');
 const logger = require('../configs/logger/logger.config');
-
+const helper = require('../utils/helper.util');
 const CACHE_KEY = 'all_categories';
 const CACHE_TTL = 3600; // Cache for 1 hour
 
@@ -32,13 +32,11 @@ exports.createCategory = async (req, res) => {
     logger.info(`POST request received to create category: ${req.body.name}`);
     try {
         if (!req.body.name) {
-            logger.warn('Attempt to create category without name');
             return res.status(422).json({
                 error: "Name is required !"
             });
         }
         if (await categoryService.checkCategoryExists(req.body.name)) {
-            logger.warn(`Attempt to create duplicate category: ${req.body.name}`);
             return res.status(409).json({
                 error: `Category ${req.body.name} already exists`
             });
@@ -59,18 +57,19 @@ exports.createCategory = async (req, res) => {
 exports.updateCategory = async (req, res) => {
     logger.info(`PUT request received to update category ID: ${req.params.id}`);
     try {
+        const isValidId = helper.isValidId(req.params.id);
+        if (!isValidId) {
+            return res.status(400).json({ error: 'Invalid category ID' });
+        }
         if (!req.body.name) {
-            logger.warn('Attempt to update category without name');
             return res.status(422).json({ error: 'Name is required' });
         } else {
             if (await categoryService.checkCategoryExists(req.body.name)) {
-                logger.warn(`Attempt to update to existing category name: ${req.body.name}`);
                 return res.status(409).json({ error: `Category ${req.body.name} already exists` });
             }
         }
         const result = await categoryService.updateCategory(req.params.id, req.body.name);
         if (!result) {
-            logger.warn(`Attempt to update non-existent category ID: ${req.params.id}`);
             return res.status(404).json({ error: 'Category not found' });
         }
 
@@ -90,11 +89,13 @@ exports.updateCategory = async (req, res) => {
 exports.deleteCategory = async (req, res) => {
     logger.info(`DELETE request received for category ID: ${req.params.id}`);
     try {
+        const isValidId = helper.isValidId(req.params.id);
+        if (!isValidId) {
+            return res.status(400).json({ error: 'Invalid category ID' });
+        }
         const result = await categoryService.deleteCategory(req.params.id);
-
         // Invalidate the cache when a category is deleted
         await cacheHelper.del(CACHE_KEY);
-
         logger.info(`Category deleted - ID: ${req.params.id}`);
         return res.status(204).json(result);
     } catch (error) {
