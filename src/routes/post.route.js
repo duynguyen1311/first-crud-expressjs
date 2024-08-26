@@ -17,7 +17,7 @@ router.get('/posts/:id', authMiddleware.authenticateJWT, (req, res) => {
     postController.getPostById(req, res);
 });
 
-router.put('/posts/:id', authMiddleware.authenticateJWT, (req, res) => {
+router.put('/posts/:id', authMiddleware.authenticateJWT, authMiddleware.authorizeRole([ROLE.EDITOR]), (req, res) => {
     /**
      * #swagger.tags = ['Posts']
      * #swagger.description = 'Update a post'

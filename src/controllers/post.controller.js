@@ -1,17 +1,57 @@
 const postService = require('../services/post.service');
 const logger = require('../configs/logger/logger.config');
 const helper = require('../utils/helper.util');
+const CacheHelper = require('../utils/cacheHelper.utils');
+const crypto = require('crypto');
+// Default filter
+const DEFAULT_FILTER = {
+    categoryId: 1,
+    userId: 1,
+    keyword: '',
+    page: 1,
+    size: 10
+};
+
+// Function to set up default filter
+const setupDefaultFilter = async () => {
+    const filterString = JSON.stringify(DEFAULT_FILTER);
+    const hashedKey = crypto.createHash('md5').update(filterString).digest('hex');
+    const cacheKey = `post_filter:default:${hashedKey}`;
+
+    try {
+        await CacheHelper.set(cacheKey, DEFAULT_FILTER, 3600); // Cache for 24 hours
+        logger.info('Default filter cached successfully');
+    } catch (error) {
+        logger.error(`Error caching default filter: ${error.message}`);
+    }
+};
+
+// Call this function when your application starts
+setupDefaultFilter();
+
 exports.getAllPost = async (req, res) => {
     logger.info('GET request received for all posts');
     try {
-        const { categoryId, userId, keyword, page, size } = req.body;
+        let { categoryId, userId, keyword, page, size } = req.body;
+
+        // If no filter provided, use the default filter
+        if (!categoryId && !userId && !keyword && !page && !size) {
+            const defaultFilterKey = `post_filter:default:${crypto.createHash('md5').update(JSON.stringify(DEFAULT_FILTER)).digest('hex')}`;
+            const cachedDefaultFilter = await CacheHelper.get(defaultFilterKey);
+            if (cachedDefaultFilter) {
+                ({ categoryId, userId, keyword, page, size } = cachedDefaultFilter);
+            } else {
+                ({ categoryId, userId, keyword, page, size } = DEFAULT_FILTER);
+            }
+        }
+
         const validation = helper.validatePostQuery(categoryId, userId, keyword, page, size);
         if (!validation.isValid) {
             return res.status(400).json(validation.errors);
         }
-        const posts = await postService.getAllPosts(categoryId, userId, keyword, page, size);
-        logger.info(`Retrieved ${posts.length} posts`);
-        return res.status(200).json(posts);
+        const result = await postService.getAllPosts(categoryId, userId, keyword, page, size);
+        logger.info(`Retrieved ${result.length} posts from database`);
+        return res.status(200).json(result);
     } catch (error) {
         logger.error(`Error in getAllPost: ${error.message}`);
         return res.status(500).json({ error: error.message });

@@ -54,12 +54,6 @@ class Helper {
             }
         }
 
-        if (keyword !== undefined) {
-            if (!this.isValidString(keyword)) {
-                errors.keyword = 'Keyword must be a non-empty string.';
-            }
-        }
-
         if (page !== undefined) {
             if (!this.isValidId(page) || parseInt(page) < 1) {
                 errors.page = 'Page must be a positive integer.';
