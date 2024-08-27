@@ -2,6 +2,8 @@ const categoryService = require('../services/category.service');
 const cacheHelper = require('../utils/cacheHelper.utils');
 const logger = require('../configs/logger/logger.config');
 const helper = require('../utils/helper.util');
+const fs = require('fs');
+const fastcsv = require('fast-csv');
 const CACHE_KEY = 'all_categories';
 const CACHE_TTL = 3600; // Cache for 1 hour
 
@@ -102,4 +104,55 @@ exports.deleteCategory = async (req, res) => {
         logger.error(`Error in deleteCategory: ${error.message}`);
         return res.status(500).json({ error: error.message });
     }
+}
+exports.importCategoriesFromCSV = async (req, res) => {
+    logger.info('POST request received to import categories from CSV');
+    if (!req.file) {
+        return res.status(400).json({ error: 'No file uploaded' });
+    }
+    const results = [];
+    const errors = [];
+
+    fastcsv.parseFile(req.file.path, { headers: true })
+        .on('data', (data) => results.push(data))
+        .on('error', (error) => {
+            logger.error(`Error parsing CSV: ${error.message}`);
+            errors.push(`Error parsing CSV: ${error.message}`);
+        })
+        .on('end', async (rowCount) => {
+            logger.info(`Parsed ${rowCount} rows`);
+            // Check if the file is empty
+            if (rowCount === 0) {
+                // Delete the uploaded file
+                fs.unlinkSync(req.file.path);
+                errors.push('No data found in the file');
+                return res.status(400).json({ error: 'No data found in the file' });
+            }
+            for (const row of results) {
+                try {
+                    if (!row.name) {
+                        errors.push(`Skipped row: Name is required`);
+                        continue;
+                    }
+                    if (await categoryService.checkCategoryExists(row.name)) {
+                        errors.push(`Skipped: Category ${row.name} already exists`);
+                        continue;
+                    }
+                    await categoryService.createCategory(row.name);
+                    logger.info(`Imported category: ${row.name}`);
+                } catch (error) {
+                    errors.push(`Error importing ${row.name}: ${error.message}`);
+                }
+            }
+
+            // Invalidate the cache after import
+            await cacheHelper.del(CACHE_KEY);
+
+            // Delete the uploaded file
+            fs.unlinkSync(req.file.path);
+
+            const message = `Import completed. ${results.length - errors.length} out of ${rowCount} categories imported successfully.`;
+            logger.info(message);
+            res.status(200).json({ message, errors });
+        });
 }

@@ -92,6 +92,44 @@
         ]
       }
     },
+    "/api/categories/import": {
+      "post": {
+        "tags": [
+          "Categories"
+        ],
+        "description": "Endpoint to import categories from a CSV file",
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "parameters": [
+          {
+            "name": "file",
+            "in": "formData",
+            "type": "file",
+            "description": "CSV file"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
     "/api/categories/{id}": {
       "put": {
         "tags": [

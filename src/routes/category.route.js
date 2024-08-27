@@ -2,11 +2,9 @@ const router = require('express').Router()
 const categoryController = require('../controllers/category.controller')
 const authMiddleware = require("../middlewares/auth.middleware");
 const ROLE = require('../common/role.constant')
-
-/*router.get('/getAll',authMiddleware.isAuthenticated, categoryController.getAllCategories )
-router.post('/create',authMiddleware.isAuthenticated, categoryController.createCategory)
-router.put('/update/:id',authMiddleware.isAuthenticated, categoryController.updateCategory)*/
-//router.delete('/:id', categoryController.deleteCategory)
+const multer = require('multer');
+// Set up multer for file upload
+const upload = multer({ dest: 'uploads/' });
 
 router.post('/categories', authMiddleware.authenticateJWT,authMiddleware.authorizeRole([ROLE.ADMIN]),
     (req, res) => {
@@ -27,7 +25,33 @@ router.post('/categories', authMiddleware.authenticateJWT,authMiddleware.authori
      */
     categoryController.createCategory(req, res);
 });
-
+//import category from csv file
+router.post('/categories/import',
+    authMiddleware.authenticateJWT,
+    authMiddleware.authorizeRole([ROLE.ADMIN]),
+    upload.single('file'),
+    (req, res) => {
+        /**
+         * #swagger.tags = ['Categories']
+         * #swagger.description = 'Endpoint to import categories from a CSV file'
+         * #swagger.security = [{ "bearerAuth": [] }]
+         * #swagger.consumes = ['multipart/form-data']
+         * #swagger.parameters['file'] = {
+         *   in: 'formData',
+         *   description: 'CSV file containing categories',
+         *   required: true,
+         *   type: 'file'
+         * }
+         * #swagger.responses[200] = {
+         *   description: 'Categories imported successfully',
+         *   schema: {
+         *     message: 'Import completed. X categories imported successfully.',
+         *     errors: ['Error 1', 'Error 2']
+         *   }
+         * }
+         */
+        categoryController.importCategoriesFromCSV(req, res);
+    });
 router.put('/categories/:id', authMiddleware.authenticateJWT,authMiddleware.authorizeRole([ROLE.ADMIN]),
     (req, res) => {
     /**
